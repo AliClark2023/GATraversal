@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://clcb3u6hm1f0i"]
+
+[ext_resource type="Texture2D" uid="uid://dg3yqld3gdehd" path="res://Assets/tilesheet_complete.png" id="1_3k1yh"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_643q3"]
+size = Vector2(64, 64)
+
+[node name="Goal" type="Area2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_643q3")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_3k1yh")
+hframes = 22
+vframes = 12
+frame = 127

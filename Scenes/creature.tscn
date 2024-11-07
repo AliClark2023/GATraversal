@@ -6,7 +6,9 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_3j0mx"]
 radius = 12.0416
 
-[node name="Creature" type="Area2D"]
+[node name="Creature" type="Area2D" groups=["Creature"]]
+collision_layer = 2
+collision_mask = 5
 script = ExtResource("1_at7bq")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

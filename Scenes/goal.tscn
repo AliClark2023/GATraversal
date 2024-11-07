@@ -5,7 +5,9 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_643q3"]
 size = Vector2(64, 64)
 
-[node name="Goal" type="Area2D"]
+[node name="Goal" type="Area2D" groups=["Goal"]]
+collision_layer = 4
+collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_643q3")

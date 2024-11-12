@@ -288,6 +288,7 @@ sources/0 = SubResource("TileSetAtlasSource_ecq0l")
 [node name="Simulation" type="Node2D"]
 script = ExtResource("1_82acu")
 spawnAmount = 40
+genomeThreshold = 0.4
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(670, 547)

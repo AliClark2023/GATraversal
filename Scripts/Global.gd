@@ -10,3 +10,4 @@ var bestDNA
 var bestFit: float = 1000000.0
 var generationNum: int = 0
 var previousGen=[]
+var nextGen=[]

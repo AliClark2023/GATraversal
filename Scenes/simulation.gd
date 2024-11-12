@@ -3,7 +3,7 @@ extends Node2D
 @onready var spawner = $SpawnFolder
 @onready var goal = $Goal
 @export var spawnAmount: int = 100
-@export var genomeThreshold: float = 0.4
+@export var genomeThreshold: float = 0.6
 @export var distanceToGoal: float = 0.0
 
 
@@ -49,6 +49,12 @@ func initialiseGenArray() -> void:
 		for j in Global.genomeSize:
 			genome.append(Vector2.ZERO)
 		Global.previousGen.append([genome, 0.0])
+		
+	for i in spawnAmount:
+		var genome = []
+		for j in Global.genomeSize:
+			genome.append(Vector2.ZERO)
+		Global.nextGen.append([genome, 0.0])
 
 # checks game state every timeout
 func _on_timer_timeout() -> void:
@@ -61,7 +67,7 @@ func _on_timer_timeout() -> void:
 	# debug
 	#print("number of dead" + str(numOfDead))
 	
-	# determines best fitness when all creatures are dead
+	# determines best fitness when all creatures are dead lower = better
 	if numOfDead == spawnAmount:
 		var bestFitnessSoFar:float = 10000000.0
 		var idOfBestFit: int = 0
@@ -107,10 +113,13 @@ func constructMutation() -> void:
 # strongest survive
 func selectStrong() -> void:
 	for i in Global.previousGen.size():
-		var distPercent: float = Global.previousGen[i][1] / distanceToGoal
-		if Global.previousGen[i][1] > genomeThreshold:
-			pass
-		pass
+		var distPercent: float = (distanceToGoal - Global.previousGen[i][1]) / distanceToGoal
+		print("global fitness" + str(Global.previousGen[i][1]))
+		# strongest genome
+		if distPercent > genomeThreshold:
+			Global.nextGen[i] = Global.previousGen[i]
+		else:
+			Global.nextGen[i]
 	pass
 # some weak survive
 func selectWeak() -> void:

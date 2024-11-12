@@ -31,6 +31,7 @@ func spawnCreatures() ->void:
 		# selection, crossover and mutation methods
 		# method testing
 		selectStrong()
+		singlePCross()
 		#selectWeak()
 		for i in spawnAmount:
 			var creature := preload("res://Scenes/creature.tscn").instantiate()
@@ -123,7 +124,7 @@ func constructMutation() -> void:
 # selection functions
 # strongest survive
 func selectStrong() -> void:
-	for i in Global.previousGen.size():
+	for i in spawnAmount:
 		var distPercent: float = (distanceToGoal - Global.previousGen[i][1]) / distanceToGoal
 		#print("global fitness" + str(Global.previousGen[i][1]))
 		# strongest genome
@@ -141,7 +142,7 @@ func selectStrong() -> void:
 			pass
 # some weak survive (50% of the weak), change to UI variable
 func selectWeak() -> void:
-	for i in Global.previousGen.size():
+	for i in spawnAmount:
 		var distPercent: float = (distanceToGoal - Global.previousGen[i][1]) / distanceToGoal
 		#print("global fitness" + str(Global.previousGen[i][1]))
 		# strongest genome
@@ -164,8 +165,30 @@ func selectWeak() -> void:
 			pass
 	pass
 
-# cross-over functions
+# cross-over functions (spawn amount and arrays need to be even numbered)
 func singlePCross() -> void:
+	for i in range(0, spawnAmount, 2):
+		# assiging parents
+		var parent1 = Global.nextGen[i][0]
+		var parent2 = Global.nextGen[i+1][0]
+		var child1 =  parent1.duplicate(true)
+		var child2 = parent2.duplicate(true)
+		
+		# crossover point is around halfway along genome (adjust through UI)
+		for j in range(Global.genomeSize/2, Global.genomeSize):
+			var par1 = parent1[j]
+			var par2 = parent2[j]
+			
+			child1[j] = par2
+			child2[j] = par1
+			#print("child1" + str(child1[j]))
+			#print("child2" + str(child2[j]))
+			pass
+		
+		# writing child to next gen array
+		Global.nextGen[i][0] = child1
+		Global.nextGen[i+1][0] = child2
+		pass
 	pass
 
 func multiPCross() -> void:

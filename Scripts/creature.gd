@@ -51,6 +51,10 @@ func _ready() -> void:
 		for i in genomeSize:
 			var v:= Vector2(randi_range(-1,1), randi_range(-1,1)).normalized() * speed
 			genome[i] = v
+	# other generations, get from global array
+	else:
+		genome = Global.nextGen[Global.geneIdx][0]
+		pass
 	
 # moves creature according to its genome (dies when reached the end of genome)
 func _physics_process(delta: float) -> void:

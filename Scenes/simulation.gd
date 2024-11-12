@@ -26,13 +26,18 @@ func _process(delta: float) -> void:
 func spawnCreatures() ->void:
 	# other generations
 	if Global.bestDNA:
+		Global.geneIdx = 0
+		# next generation method goes here, contains
+		# selection, crossover and mutation methods
+		# method testing
+		selectStrong()
+		#selectWeak()
 		for i in spawnAmount:
-			# selection, crossover and mutation methods go here
-			selectStrong();
-			
 			var creature := preload("res://Scenes/creature.tscn").instantiate()
 			creature.firstGen = false
 			spawner.add_child(creature)
+			Global.geneIdx += 1
+
 		for creature in spawner.get_children():
 			creature.alive = true
 	# first generation
@@ -90,6 +95,12 @@ func _on_timer_timeout() -> void:
 		Global.generationNum +=1
 		get_tree().reload_current_scene()
 
+# uses a selection method, crossover, mutation to create next generation
+func nextGenCreation() -> void:
+	selectStrong()
+	selectWeak()
+	pass
+	
 # mutation functions (entire genome)
 # keeps mutated genome regardless of fitness
 func destMutation() -> void:
@@ -114,15 +125,43 @@ func constructMutation() -> void:
 func selectStrong() -> void:
 	for i in Global.previousGen.size():
 		var distPercent: float = (distanceToGoal - Global.previousGen[i][1]) / distanceToGoal
-		print("global fitness" + str(Global.previousGen[i][1]))
+		#print("global fitness" + str(Global.previousGen[i][1]))
 		# strongest genome
 		if distPercent > genomeThreshold:
 			Global.nextGen[i] = Global.previousGen[i]
+		# determine method for weak genomes
 		else:
-			Global.nextGen[i]
-	pass
-# some weak survive
+			for j in Global.genomeSize:
+				var gene: Vector2 = Global.previousGen[i][0][j]
+				var newX: float =  abs(Global.previousGen[i][0][j].x * 0.10);
+				var newY: float =  abs(Global.previousGen[i][0][j].y * 0.10);
+				var newGene = Vector2(randf_range(gene.x - newX, gene.x + newX), randf_range(gene.y - newY, gene.y + newY))
+				Global.nextGen[i][0][j] = newGene
+				pass
+			pass
+# some weak survive (50% of the weak), change to UI variable
 func selectWeak() -> void:
+	for i in Global.previousGen.size():
+		var distPercent: float = (distanceToGoal - Global.previousGen[i][1]) / distanceToGoal
+		#print("global fitness" + str(Global.previousGen[i][1]))
+		# strongest genome
+		if distPercent > genomeThreshold:
+			Global.nextGen[i] = Global.previousGen[i]
+		# selects 50% of the weaker genomes
+		elif distPercent < genomeThreshold && randf() < 0.5:
+			Global.nextGen[i] = Global.previousGen[i]
+			pass
+		# determine method for other weak genomes
+		# randomises genome +- 10% of previous parent (add to UI)
+		else:
+			for j in Global.genomeSize:
+				var gene: Vector2 = Global.previousGen[i][0][j]
+				var newX: float =  abs(Global.previousGen[i][0][j].x * 0.10);
+				var newY: float =  abs(Global.previousGen[i][0][j].y * 0.10);
+				var newGene = Vector2(randf_range(gene.x - newX, gene.x + newX), randf_range(gene.y - newY, gene.y + newY))
+				Global.nextGen[i][0][j] = newGene
+				pass
+			pass
 	pass
 
 # cross-over functions

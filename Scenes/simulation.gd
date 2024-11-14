@@ -9,11 +9,13 @@ extends Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# remove if not needed
 	distanceToGoal = ((spawner.global_position.distance_to(goal.global_position)))
 	
+	# initialse Generation arrays if not done so already
 	if Global.previousGen.size() == 0:
 		initialiseGenArray()
-
+	Global.numReachedGoal = 0
 	print ("Generation: " + str(Global.generationNum))
 	spawnCreatures()
 
@@ -27,12 +29,16 @@ func spawnCreatures() ->void:
 	# other generations
 	if Global.bestDNA:
 		Global.geneIdx = 0
-		# next generation method goes here, contains
-		# selection, crossover and mutation methods
+		## next generation method goes here, contains
+		## selection, crossover and mutation methods
+		
 		# method testing
-		selectStrong()
-		singlePCross()
-		#selectWeak()
+		selectWeak()
+		#singlePCross()
+		#multiPCross()
+		randomPCross()
+		destMutation()
+		
 		for i in spawnAmount:
 			var creature := preload("res://Scenes/creature.tscn").instantiate()
 			creature.firstGen = false
@@ -94,78 +100,93 @@ func _on_timer_timeout() -> void:
 			Global.bestDNA = spawner.get_child(idOfBestFit).genome
 		
 		Global.generationNum +=1
+		print("Reached Goal" + str(Global.numReachedGoal))
+		print("Closest distance" + str(Global.bestFit))
 		get_tree().reload_current_scene()
 
-# uses a selection method, crossover, mutation to create next generation
+## uses a selection method, crossover, mutation to create next generation
 func nextGenCreation() -> void:
+	## assign via UI
+	var strongGenomes: bool = false;
+	var weakerGenomes: bool = false;
+	
 	selectStrong()
 	selectWeak()
 	pass
 	
 # mutation functions (entire genome)
-# keeps mutated genome regardless of fitness
-func destMutation() -> void:
-	var creature := preload("res://Scenes/creature.tscn").instantiate()
-	creature.firstGen = false
-	creature.alive = true
-	
-	for i in creature.genomeSize:
-		var v: Vector2 = Vector2(randi_range(-1,1), randi_range(-1,1)).normalized() * creature.speed
-		creature.genome.append(v)
-		#creature.genome[i] = v
-		pass
-	
-	spawner.add_child(creature)
-	print("mutated")
 
+## keeps mutated genome regardless of fitness
+func destMutation() -> void:
+	## testing new method
+	# make UI adjustable
+	var mutationFactor: float = 0.15
+	# each genome will have a % chance of mutating
+	for i in spawnAmount:
+		var rdm : float = randf()
+		if rdm < mutationFactor:
+			#print("mutating")
+			# creation of new genome
+			for j in Global.genomeSize:
+				var v:= Vector2(randi_range(-1,1), randi_range(-1,1)).normalized() * Global.creatureSpeed
+				Global.nextGen[i][0][j] = v
+
+## needs to re calculate fitness, may not be possible given nature of program
 func constructMutation() -> void:
 	pass
 
-# selection functions
-# strongest survive
+## selection functions
+
+## strongest survive
+## will select genomes that are within a thresold of the best fitness
+## or will create strong genome from best fit +- a percentage (available on UI)
 func selectStrong() -> void:
 	for i in spawnAmount:
-		var distPercent: float = (distanceToGoal - Global.previousGen[i][1]) / distanceToGoal
-		#print("global fitness" + str(Global.previousGen[i][1]))
-		# strongest genome
-		if distPercent > genomeThreshold:
+		var strongThreshold: float = genomeThreshold * Global.bestFit
+		var currentFitness: float = Global.previousGen[i][1]
+		# geneome is passed on if fitness is within threshold
+		if currentFitness > (Global.bestFit - strongThreshold) and currentFitness < (Global.bestFit + strongThreshold):
 			Global.nextGen[i] = Global.previousGen[i]
-		# determine method for weak genomes
+		# genome is randomised from best fit genome?
+		# genome is discarded and a new one is created?
 		else:
+			## randomised from best fit, make available on UI
+			var bestFitVariance: float = 0.30
 			for j in Global.genomeSize:
-				var gene: Vector2 = Global.previousGen[i][0][j]
-				var newX: float =  abs(Global.previousGen[i][0][j].x * 0.10);
-				var newY: float =  abs(Global.previousGen[i][0][j].y * 0.10);
+				var gene: Vector2 = Global.bestDNA[j]
+				var newX: float =  abs(gene.x * bestFitVariance);
+				var newY: float =  abs(gene.y * bestFitVariance);
 				var newGene = Vector2(randf_range(gene.x - newX, gene.x + newX), randf_range(gene.y - newY, gene.y + newY))
 				Global.nextGen[i][0][j] = newGene
-				pass
-			pass
-# some weak survive (50% of the weak), change to UI variable
+		pass
+
+## some weak survive (50% of the weak), change to UI variable
+## strong selection based on same method on selectStrong
 func selectWeak() -> void:
+	var selectWeakChance :float = 0.5
 	for i in spawnAmount:
-		var distPercent: float = (distanceToGoal - Global.previousGen[i][1]) / distanceToGoal
-		#print("global fitness" + str(Global.previousGen[i][1]))
-		# strongest genome
-		if distPercent > genomeThreshold:
+		var rdm = randf()
+		var strongThreshold: float = genomeThreshold * Global.bestFit
+		var currentFitness: float = Global.previousGen[i][1]
+		# strong geneome is passed on if fitness is within threshold
+		if currentFitness > (Global.bestFit - strongThreshold) and currentFitness < (Global.bestFit + strongThreshold):
 			Global.nextGen[i] = Global.previousGen[i]
 		# selects 50% of the weaker genomes
-		elif distPercent < genomeThreshold && randf() < 0.5:
+		elif rdm < selectWeakChance:
 			Global.nextGen[i] = Global.previousGen[i]
-			pass
-		# determine method for other weak genomes
-		# randomises genome +- 10% of previous parent (add to UI)
+		# discards the rest and creates new genome
 		else:
+			## randomised from best fit, make available on UI
+			var bestFitVariance: float = 0.30
 			for j in Global.genomeSize:
-				var gene: Vector2 = Global.previousGen[i][0][j]
-				var newX: float =  abs(Global.previousGen[i][0][j].x * 0.10);
-				var newY: float =  abs(Global.previousGen[i][0][j].y * 0.10);
+				var gene: Vector2 = Global.bestDNA[j]
+				var newX: float =  abs(gene.x * bestFitVariance);
+				var newY: float =  abs(gene.y * bestFitVariance);
 				var newGene = Vector2(randf_range(gene.x - newX, gene.x + newX), randf_range(gene.y - newY, gene.y + newY))
 				Global.nextGen[i][0][j] = newGene
-				pass
-			pass
-	pass
 
-# cross-over functions (spawn amount and arrays need to be even numbered)
+## cross-over functions (spawn amount and arrays need to be even numbered)
+## crossover from a specified index point onwards (point to be adjusted in UI)
 func singlePCross() -> void:
 	for i in range(0, spawnAmount, 2):
 		# assiging parents
@@ -191,8 +212,58 @@ func singlePCross() -> void:
 		pass
 	pass
 
+## crossover between two index points (points to be adjusted in UI)
 func multiPCross() -> void:
+	for i in range(0, spawnAmount, 2):
+		# assiging parents
+		var parent1 = Global.nextGen[i][0]
+		var parent2 = Global.nextGen[i+1][0]
+		var child1 =  parent1.duplicate(true)
+		var child2 = parent2.duplicate(true)
+		## cross-overpoints (make Available in UI, between 0 and 75(genomesize))
+		var indexStart: int = Global.genomeSize/5
+		var indexEnd: int = Global.genomeSize/1.5
+		
+		# crossover point is around halfway along genome (adjust through UI)
+		for j in range(indexStart, indexEnd):
+			var par1 = parent1[j]
+			var par2 = parent2[j]
+			
+			child1[j] = par2
+			child2[j] = par1
+			#print("child1" + str(child1[j]))
+			#print("child2" + str(child2[j]))
+			pass
+		
+		# writing child to next gen array
+		Global.nextGen[i][0] = child1
+		Global.nextGen[i+1][0] = child2
+		pass
 	pass
 
+## crossover from a random index point onwards
 func randomPCross() -> void:
-	pass
+	for i in range(0, spawnAmount, 2):
+		# assiging parents
+		var parent1 = Global.nextGen[i][0]
+		var parent2 = Global.nextGen[i+1][0]
+		var child1 =  parent1.duplicate(true)
+		var child2 = parent2.duplicate(true)
+		# creating random cross-over point
+		var rdmIdx: float = randi_range(0, Global.genomeSize)
+		
+		# crossover point is around halfway along genome (adjust through UI)
+		for j in range(rdmIdx, Global.genomeSize):
+			var par1 = parent1[j]
+			var par2 = parent2[j]
+			
+			child1[j] = par2
+			child2[j] = par1
+			#print("child1" + str(child1[j]))
+			#print("child2" + str(child2[j]))
+			pass
+		
+		# writing child to next gen array
+		Global.nextGen[i][0] = child1
+		Global.nextGen[i+1][0] = child2
+		pass

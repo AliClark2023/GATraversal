@@ -12,3 +12,4 @@ var generationNum: int = 0
 var previousGen=[]
 var nextGen=[]
 var geneIdx: int = 0
+var numReachedGoal: int = 0

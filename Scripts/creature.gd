@@ -2,7 +2,7 @@ extends Area2D
 #var original:bool = false
 var alive:bool = false
 var firstGen:bool = true
-var speed: float = 20.0
+var speed: float = Global.creatureSpeed
 var genome =[]
 var gene: int = 0;
 # fitness is distance to goal (lower = better)
@@ -88,7 +88,8 @@ func _on_body_entered(body: Node2D) -> void:
 func _on_area_entered(area: Area2D) -> void:
 	#print("Collided with area")
 	if area.is_in_group("Goal"):
-		print("Collided with goal")
+		#print("Collided with goal")
+		Global.numReachedGoal += 1
 		die()
 
 # mutation functions (remove once added in simulation)

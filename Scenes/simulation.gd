@@ -2,16 +2,12 @@ extends Node2D
 
 @onready var spawner = $SpawnFolder
 @onready var goal = $Goal
-@export var spawnAmount: int = 100
-@export var genomeThreshold: float = 0.6
-@export var distanceToGoal: float = 0.0
-
+## replace with global spawn number
+@export var spawnAmount: int = Global.creaturesToSpawn
+@export var genomeThreshold: float = Global.bestFitTolerance
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# remove if not needed
-	distanceToGoal = ((spawner.global_position.distance_to(goal.global_position)))
-	
 	# initialse Generation arrays if not done so already
 	if Global.previousGen.size() == 0:
 		initialiseGenArray()
@@ -28,26 +24,23 @@ func _process(delta: float) -> void:
 func spawnCreatures() ->void:
 	# other generations
 	if Global.bestDNA:
+		## reset index, to be used in creature creation for gen2 onwards
 		Global.geneIdx = 0
-		## next generation method goes here, contains
-		## selection, crossover and mutation methods
 		
-		# method testing
-		selectWeak()
-		#singlePCross()
-		#multiPCross()
-		randomPCross()
-		destMutation()
+		## creates next gen based on simulation results
+		nextGenCreation()
 		
+		## spawns creatures with info from next gen array
 		for i in spawnAmount:
 			var creature := preload("res://Scenes/creature.tscn").instantiate()
 			creature.firstGen = false
 			spawner.add_child(creature)
 			Global.geneIdx += 1
-
+		
+		## sets each creature alive
 		for creature in spawner.get_children():
 			creature.alive = true
-	# first generation
+	## first generation
 	else:
 		for i in spawnAmount:
 			var creature := preload("res://Scenes/creature.tscn").instantiate()
@@ -55,31 +48,32 @@ func spawnCreatures() ->void:
 			creature.alive = true
 			spawner.add_child(creature)
 
-func initialiseGenArray() -> void:			
+## initialises global arrays
+func initialiseGenArray() -> void:
 	for i in spawnAmount:
 		var genome = []
 		for j in Global.genomeSize:
 			genome.append(Vector2.ZERO)
 		Global.previousGen.append([genome, 0.0])
-		
+	
 	for i in spawnAmount:
 		var genome = []
 		for j in Global.genomeSize:
 			genome.append(Vector2.ZERO)
 		Global.nextGen.append([genome, 0.0])
 
-# checks game state every timeout
+## checks game state every timeout (set to 1s)
 func _on_timer_timeout() -> void:
 	var numOfDead:int = 0
 	# checks if all creatures are dead
 	for creature in spawner.get_children():
 		if !creature.alive:
 			numOfDead += 1
-			
+	
 	# debug
 	#print("number of dead" + str(numOfDead))
 	
-	# determines best fitness when all creatures are dead lower = better
+	## determines best fitness when all creatures are dead lower = better
 	if numOfDead == spawnAmount:
 		var bestFitnessSoFar:float = 10000000.0
 		var idOfBestFit: int = 0
@@ -90,7 +84,7 @@ func _on_timer_timeout() -> void:
 				idOfBestFit = i
 				bestFitnessSoFar = fitness
 				
-			# adding to previous gen array
+			## adding to previous gen array
 			for j in spawner.get_child(i).genomeSize:
 				Global.previousGen[i][0][j] = spawner.get_child(i).genome[j]
 			Global.previousGen[i][1] = fitness
@@ -100,33 +94,51 @@ func _on_timer_timeout() -> void:
 			Global.bestDNA = spawner.get_child(idOfBestFit).genome
 		
 		Global.generationNum +=1
-		print("Reached Goal" + str(Global.numReachedGoal))
-		print("Closest distance" + str(Global.bestFit))
-		get_tree().reload_current_scene()
+		#print("Reached Goal" + str(Global.numReachedGoal))
+		#print("Closest distance" + str(Global.bestFit))
+		
+		## move condition to start of timeout
+		## add condition to reload scene if input have changed
+		if (Global.generationNum >= Global.generationLimit):
+			pass
+		else:
+			get_tree().reload_current_scene()
 
 ## uses a selection method, crossover, mutation to create next generation
 func nextGenCreation() -> void:
 	## assign via UI
-	var strongGenomes: bool = false;
-	var weakerGenomes: bool = false;
+	var strongGenomes: bool = Global.strongGenomes
+	var singlePointCross: bool = Global.singlePointCross
+	var randomPointCross: bool = Global.randomPointCross
 	
-	selectStrong()
-	selectWeak()
-	pass
-	
-# mutation functions (entire genome)
+	## selection method
+	if strongGenomes:
+		selectStrong()
+	else:
+		selectWeak()
+		
+	if randomPointCross:
+		randomPCross()
+	else:
+		if singlePointCross:
+			singlePCross()
+		else:
+			multiPCross()
+			
+	## has chance to mutate within function
+	destMutation()
 
+## mutation functions (entire genome)
 ## keeps mutated genome regardless of fitness
 func destMutation() -> void:
-	## testing new method
 	# make UI adjustable
-	var mutationFactor: float = 0.15
+	var mutationChance: float = 0.01
 	# each genome will have a % chance of mutating
 	for i in spawnAmount:
 		var rdm : float = randf()
-		if rdm < mutationFactor:
+		if rdm < mutationChance:
 			#print("mutating")
-			# creation of new genome
+			# creation of new genome or mutate part of genome?
 			for j in Global.genomeSize:
 				var v:= Vector2(randi_range(-1,1), randi_range(-1,1)).normalized() * Global.creatureSpeed
 				Global.nextGen[i][0][j] = v
@@ -141,6 +153,7 @@ func constructMutation() -> void:
 ## will select genomes that are within a thresold of the best fitness
 ## or will create strong genome from best fit +- a percentage (available on UI)
 func selectStrong() -> void:
+	print("selecting strong")
 	for i in spawnAmount:
 		var strongThreshold: float = genomeThreshold * Global.bestFit
 		var currentFitness: float = Global.previousGen[i][1]
@@ -163,6 +176,7 @@ func selectStrong() -> void:
 ## some weak survive (50% of the weak), change to UI variable
 ## strong selection based on same method on selectStrong
 func selectWeak() -> void:
+	print("selecting weak")
 	var selectWeakChance :float = 0.5
 	for i in spawnAmount:
 		var rdm = randf()
@@ -187,83 +201,98 @@ func selectWeak() -> void:
 
 ## cross-over functions (spawn amount and arrays need to be even numbered)
 ## crossover from a specified index point onwards (point to be adjusted in UI)
+## chance of crossover to occur (adhusted through UI)
 func singlePCross() -> void:
+	print("Single Pcross enabled")
+	var crossoverChance: float = 0.5
 	for i in range(0, spawnAmount, 2):
-		# assiging parents
-		var parent1 = Global.nextGen[i][0]
-		var parent2 = Global.nextGen[i+1][0]
-		var child1 =  parent1.duplicate(true)
-		var child2 = parent2.duplicate(true)
-		
-		# crossover point is around halfway along genome (adjust through UI)
-		for j in range(Global.genomeSize/2, Global.genomeSize):
-			var par1 = parent1[j]
-			var par2 = parent2[j]
+		var rdm: float = randf()
+		if rdm < crossoverChance:
+			#print ("single P crossover")
+			# assiging parents
+			var parent1 = Global.nextGen[i][0]
+			var parent2 = Global.nextGen[i+1][0]
+			var child1 =  parent1.duplicate(true)
+			var child2 = parent2.duplicate(true)
 			
-			child1[j] = par2
-			child2[j] = par1
-			#print("child1" + str(child1[j]))
-			#print("child2" + str(child2[j]))
-			pass
-		
-		# writing child to next gen array
-		Global.nextGen[i][0] = child1
-		Global.nextGen[i+1][0] = child2
-		pass
-	pass
+			# crossover point is around halfway along genome (adjust through UI)
+			for j in range(Global.genomeSize/2, Global.genomeSize):
+				var par1 = parent1[j]
+				var par2 = parent2[j]
+				
+				child1[j] = par2
+				child2[j] = par1
+				#print("child1" + str(child1[j]))
+				#print("child2" + str(child2[j]))
+				pass
+			
+			# writing child to next gen array
+			Global.nextGen[i][0] = child1
+			Global.nextGen[i+1][0] = child2
 
 ## crossover between two index points (points to be adjusted in UI)
 func multiPCross() -> void:
+	print("Multi Pcross enabled")
+	var crossoverChance: float = 0.5
 	for i in range(0, spawnAmount, 2):
-		# assiging parents
-		var parent1 = Global.nextGen[i][0]
-		var parent2 = Global.nextGen[i+1][0]
-		var child1 =  parent1.duplicate(true)
-		var child2 = parent2.duplicate(true)
-		## cross-overpoints (make Available in UI, between 0 and 75(genomesize))
-		var indexStart: int = Global.genomeSize/5
-		var indexEnd: int = Global.genomeSize/1.5
-		
-		# crossover point is around halfway along genome (adjust through UI)
-		for j in range(indexStart, indexEnd):
-			var par1 = parent1[j]
-			var par2 = parent2[j]
+		var rdm: float = randf()
+		if rdm < crossoverChance:
+			#print ("multi P crossover")
+			# assiging parents
+			var parent1 = Global.nextGen[i][0]
+			var parent2 = Global.nextGen[i+1][0]
+			var child1 =  parent1.duplicate(true)
+			var child2 = parent2.duplicate(true)
+			## cross-overpoints (make Available in UI, between 0 and 75(genomesize))
+			var indexStart: int = Global.genomeSize/5
+			var indexEnd: int = Global.genomeSize/1.5
 			
-			child1[j] = par2
-			child2[j] = par1
-			#print("child1" + str(child1[j]))
-			#print("child2" + str(child2[j]))
+			# crossover point is around halfway along genome (adjust through UI)
+			for j in range(indexStart, indexEnd):
+				var par1 = parent1[j]
+				var par2 = parent2[j]
+				
+				child1[j] = par2
+				child2[j] = par1
+				#print("child1" + str(child1[j]))
+				#print("child2" + str(child2[j]))
+				pass
+			
+			# writing child to next gen array
+			Global.nextGen[i][0] = child1
+			Global.nextGen[i+1][0] = child2
 			pass
-		
-		# writing child to next gen array
-		Global.nextGen[i][0] = child1
-		Global.nextGen[i+1][0] = child2
-		pass
 	pass
 
 ## crossover from a random index point onwards
 func randomPCross() -> void:
+	print("Random Pcross enabled")
+	var crossoverChance: float = 0.5
+	
 	for i in range(0, spawnAmount, 2):
-		# assiging parents
-		var parent1 = Global.nextGen[i][0]
-		var parent2 = Global.nextGen[i+1][0]
-		var child1 =  parent1.duplicate(true)
-		var child2 = parent2.duplicate(true)
-		# creating random cross-over point
-		var rdmIdx: float = randi_range(0, Global.genomeSize)
-		
-		# crossover point is around halfway along genome (adjust through UI)
-		for j in range(rdmIdx, Global.genomeSize):
-			var par1 = parent1[j]
-			var par2 = parent2[j]
+		var rdm: float = randf()
+		if rdm < crossoverChance:
+			print ("random P crossover")
+			# assiging parents
+			var parent1 = Global.nextGen[i][0]
+			var parent2 = Global.nextGen[i+1][0]
+			var child1 =  parent1.duplicate(true)
+			var child2 = parent2.duplicate(true)
+			# creating random cross-over point
+			var rdmIdx: float = randi_range(0, Global.genomeSize)
 			
-			child1[j] = par2
-			child2[j] = par1
-			#print("child1" + str(child1[j]))
-			#print("child2" + str(child2[j]))
+			# crossover point is randomly along genome
+			for j in range(rdmIdx, Global.genomeSize):
+				var par1 = parent1[j]
+				var par2 = parent2[j]
+				
+				child1[j] = par2
+				child2[j] = par1
+				#print("child1" + str(child1[j]))
+				#print("child2" + str(child2[j]))
+				pass
+			
+			# writing child to next gen array
+			Global.nextGen[i][0] = child1
+			Global.nextGen[i+1][0] = child2
 			pass
-		
-		# writing child to next gen array
-		Global.nextGen[i][0] = child1
-		Global.nextGen[i+1][0] = child2
-		pass

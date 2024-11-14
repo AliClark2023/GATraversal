@@ -1,0 +1,142 @@
+[gd_scene load_steps=2 format=3 uid="uid://donjoi8h3hos7"]
+
+[ext_resource type="Script" path="res://Scripts/menu.gd" id="1_1s0fa"]
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 262.0
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 261.0
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 99.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+color = Color(0.099, 0, 0.27, 1)
+
+[node name="Menu" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 350.0
+offset_bottom = 722.0
+theme_override_constants/separation = 5
+script = ExtResource("1_1s0fa")
+
+[node name="SelectionMethod" type="CheckButton" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Weak Genomes
+"
+
+[node name="CrossMethod" type="CheckButton" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Multi Point Cross
+"
+
+[node name="RandomPointCross" type="CheckBox" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Select Random Point Cross"
+
+[node name="Population" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Population Number:
+"
+
+[node name="Input" type="SpinBox" parent="Menu/Population"]
+layout_mode = 0
+offset_left = 277.0
+offset_top = 2.0
+offset_right = 360.063
+offset_bottom = 33.0
+min_value = 20.0
+max_value = 200.0
+step = 2.0
+value = 20.0
+alignment = 2
+
+[node name="GenerationLimit" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Generation Limit:
+"
+
+[node name="Input" type="SpinBox" parent="Menu/GenerationLimit"]
+layout_mode = 0
+offset_left = 277.0
+offset_top = 6.0
+offset_right = 360.063
+offset_bottom = 37.0
+min_value = 30.0
+value = 30.0
+alignment = 2
+
+[node name="BestFitTolerance" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Best Fit Tolerance:
+"
+
+[node name="Input" type="SpinBox" parent="Menu/BestFitTolerance"]
+layout_mode = 0
+offset_left = 277.0
+offset_top = 4.0
+offset_right = 360.063
+offset_bottom = 35.0
+min_value = 0.1
+max_value = 1.0
+step = 0.05
+value = 0.1
+alignment = 2
+
+[node name="MutationChance" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Mutation Chance:
+"
+
+[node name="Input" type="SpinBox" parent="Menu/MutationChance"]
+layout_mode = 0
+offset_left = 277.0
+offset_right = 360.063
+offset_bottom = 31.0
+min_value = 0.01
+max_value = 1.0
+step = 0.01
+value = 0.01
+alignment = 2
+
+[node name="CrossoverChance" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Crossover Chance:
+"
+
+[node name="Input" type="SpinBox" parent="Menu/CrossoverChance"]
+layout_mode = 0
+offset_left = 278.0
+offset_right = 361.063
+offset_bottom = 31.0
+min_value = 0.01
+max_value = 1.0
+step = 0.01
+value = 0.01
+alignment = 2
+
+[connection signal="toggled" from="Menu/SelectionMethod" to="Menu" method="_on_selection_method_toggled"]
+[connection signal="toggled" from="Menu/CrossMethod" to="Menu" method="_on_cross_method_toggled"]
+[connection signal="toggled" from="Menu/RandomPointCross" to="Menu" method="_on_random_point_cross_toggled"]

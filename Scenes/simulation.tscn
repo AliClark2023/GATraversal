@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=4 uid="uid://cc7ox3dkky11r"]
+[gd_scene load_steps=7 format=4 uid="uid://cc7ox3dkky11r"]
 
 [ext_resource type="Script" path="res://Scenes/simulation.gd" id="1_82acu"]
 [ext_resource type="Texture2D" uid="uid://dg3yqld3gdehd" path="res://Assets/tilesheet_complete.png" id="1_kmcyq"]
 [ext_resource type="PackedScene" uid="uid://clcb3u6hm1f0i" path="res://Scenes/goal.tscn" id="3_b3odl"]
+[ext_resource type="PackedScene" uid="uid://donjoi8h3hos7" path="res://Scenes/ui.tscn" id="4_h0d2d"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ecq0l"]
 texture = ExtResource("1_kmcyq")
@@ -287,8 +288,6 @@ sources/0 = SubResource("TileSetAtlasSource_ecq0l")
 
 [node name="Simulation" type="Node2D"]
 script = ExtResource("1_82acu")
-spawnAmount = 40
-genomeThreshold = 0.4
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(670, 547)
@@ -307,5 +306,11 @@ position = Vector2(1693, 676)
 
 [node name="Timer" type="Timer" parent="."]
 autostart = true
+
+[node name="UI" parent="." instance=ExtResource("4_h0d2d")]
+offset_left = -597.0
+offset_top = -148.0
+offset_right = -597.0
+offset_bottom = -148.0
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

@@ -5,23 +5,36 @@ extends Node2D
 ## replace with global spawn number
 @export var spawnAmount: int = Global.creaturesToSpawn
 @export var genomeThreshold: float = Global.bestFitTolerance
+var started: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# initialse Generation arrays if not done so already
-	if Global.previousGen.size() == 0:
-		initialiseGenArray()
-	Global.numReachedGoal = 0
-	print ("Generation: " + str(Global.generationNum))
-	spawnCreatures()
+	## only starts when user starts simulations
+	if Global.startSimulation:
+		started = true
+		## initialse Generation arrays if not done so already
+		if Global.previousGen.size() == 0:
+			initialiseGenArray()
+		spawnCreatures()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	if Global.startSimulation and started == false:
+		started = true
+		## initialse Generation arrays if not done so already
+		if Global.previousGen.size() == 0:
+			## needed to update spawn amount when starting simulation
+			spawnAmount = Global.creaturesToSpawn
+			initialiseGenArray()
+			
+		spawnCreatures()
 	pass
 
 
 func spawnCreatures() ->void:
+	Global.numReachedGoal = 0
+	print ("Generation: " + str(Global.generationNum))
 	# other generations
 	if Global.bestDNA:
 		## reset index, to be used in creature creation for gen2 onwards
@@ -63,46 +76,108 @@ func initialiseGenArray() -> void:
 		Global.nextGen.append([genome, 0.0])
 
 ## checks game state every timeout (set to 1s)
+## determines state of creatures
 func _on_timer_timeout() -> void:
-	var numOfDead:int = 0
-	# checks if all creatures are dead
-	for creature in spawner.get_children():
-		if !creature.alive:
-			numOfDead += 1
-	
-	# debug
-	#print("number of dead" + str(numOfDead))
-	
-	## determines best fitness when all creatures are dead lower = better
-	if numOfDead == spawnAmount:
-		var bestFitnessSoFar:float = 10000000.0
-		var idOfBestFit: int = 0
+	if (Global.generationNum >= Global.generationLimit or !Global.startSimulation):
+		Global.startSimulation = false
+	else:
+		## checks if all creatures are dead
+		var numOfDead:int = 0
+		for creature in spawner.get_children():
+			if !creature.alive:
+				numOfDead += 1
+		if numOfDead == spawnAmount:
+			## debug
+			##print("number of dead" + str(numOfDead))
+			var bestFitnessSoFar:float = 10000000.0
+			var idOfBestFit: int = 0
 		
-		for i in spawner.get_child_count():
-			var fitness: float = spawner.get_child(i).fitness
-			if fitness < bestFitnessSoFar:
-				idOfBestFit = i
-				bestFitnessSoFar = fitness
+			for i in spawner.get_child_count():
+				var fitness: float = spawner.get_child(i).fitness
+				if fitness < bestFitnessSoFar:
+					idOfBestFit = i
+					bestFitnessSoFar = fitness
 				
-			## adding to previous gen array
-			for j in spawner.get_child(i).genomeSize:
-				Global.previousGen[i][0][j] = spawner.get_child(i).genome[j]
-			Global.previousGen[i][1] = fitness
+				## adding to previous gen array
+				for j in spawner.get_child(i).genomeSize:
+					Global.previousGen[i][0][j] = spawner.get_child(i).genome[j]
+					Global.previousGen[i][1] = fitness
+
+			if Global.bestFit > bestFitnessSoFar:
+				Global.bestFit = bestFitnessSoFar
+				Global.bestDNA = spawner.get_child(idOfBestFit).genome
 		
-		if Global.bestFit > bestFitnessSoFar:
-			Global.bestFit = bestFitnessSoFar
-			Global.bestDNA = spawner.get_child(idOfBestFit).genome
+			Global.generationNum +=1
+			#print("Reached Goal" + str(Global.numReachedGoal))
+			#print("Closest distance" + str(Global.bestFit))
+			## Staticstic calculations
+			_calculateAverageFitnessGen()
 		
-		Global.generationNum +=1
-		#print("Reached Goal" + str(Global.numReachedGoal))
-		#print("Closest distance" + str(Global.bestFit))
-		
-		## move condition to start of timeout
-		## add condition to reload scene if input have changed
-		if (Global.generationNum >= Global.generationLimit):
-			pass
-		else:
+			## go to next generation
 			get_tree().reload_current_scene()
+
+		
+	#var numOfDead:int = 0
+	## checks if all creatures are dead
+	#for creature in spawner.get_children():
+		#if !creature.alive:
+			#numOfDead += 1
+	#
+	## debug
+	##print("number of dead" + str(numOfDead))
+	#
+	### determines best fitness when all creatures are dead lower = better
+	#if numOfDead == spawnAmount:
+		### move condition to start of timeout
+		### add condition to reload scene if input have changed
+		### end condition
+		#if (Global.generationNum >= Global.generationLimit):
+			#Global.startSimulation = false
+		#else:
+			#var bestFitnessSoFar:float = 10000000.0
+			#var idOfBestFit: int = 0
+		#
+			#for i in spawner.get_child_count():
+				#var fitness: float = spawner.get_child(i).fitness
+				#if fitness < bestFitnessSoFar:
+					#idOfBestFit = i
+					#bestFitnessSoFar = fitness
+				#
+				### adding to previous gen array
+				#for j in spawner.get_child(i).genomeSize:
+					#Global.previousGen[i][0][j] = spawner.get_child(i).genome[j]
+					#Global.previousGen[i][1] = fitness
+		#
+			#if Global.bestFit > bestFitnessSoFar:
+				#Global.bestFit = bestFitnessSoFar
+				#Global.bestDNA = spawner.get_child(idOfBestFit).genome
+		#
+			#Global.generationNum +=1
+			##print("Reached Goal" + str(Global.numReachedGoal))
+			##print("Closest distance" + str(Global.bestFit))
+		#
+		### Staticstic calculations
+		#_calculateAverageFitnessGen()
+		#
+		### go to next generation
+		#get_tree().reload_current_scene()
+
+## end points of simulation
+func averageTest() -> bool:
+	
+	return false
+
+## statistic calculations
+##
+func _calculateAverageFitnessGen() ->void:
+	var totalFitness: float = 0.0
+	for i in spawner.get_child_count():
+			var fitness: float = spawner.get_child(i).fitness
+			totalFitness += fitness
+	
+	var avgFitness: float = totalFitness / Global.creaturesToSpawn
+	Global.averageFitnessGen = avgFitness
+	pass
 
 ## uses a selection method, crossover, mutation to create next generation
 func nextGenCreation() -> void:
@@ -148,7 +223,7 @@ func constructMutation() -> void:
 	pass
 
 ## selection functions
-
+##
 ## strongest survive
 ## will select genomes that are within a thresold of the best fitness
 ## or will create strong genome from best fit +- a percentage (available on UI)

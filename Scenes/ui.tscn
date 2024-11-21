@@ -57,7 +57,7 @@ theme_override_font_sizes/font_size = 25
 text = "Population Number:
 "
 
-[node name="Input" type="SpinBox" parent="Menu/Population"]
+[node name="PopInput" type="SpinBox" parent="Menu/Population"]
 layout_mode = 0
 offset_left = 277.0
 offset_top = 2.0
@@ -75,13 +75,13 @@ theme_override_font_sizes/font_size = 25
 text = "Generation Limit:
 "
 
-[node name="Input" type="SpinBox" parent="Menu/GenerationLimit"]
+[node name="GenInput" type="SpinBox" parent="Menu/GenerationLimit"]
 layout_mode = 0
 offset_left = 277.0
 offset_top = 6.0
 offset_right = 360.063
 offset_bottom = 37.0
-min_value = 30.0
+min_value = 10.0
 value = 30.0
 alignment = 2
 
@@ -91,7 +91,7 @@ theme_override_font_sizes/font_size = 25
 text = "Best Fit Tolerance:
 "
 
-[node name="Input" type="SpinBox" parent="Menu/BestFitTolerance"]
+[node name="FitInput" type="SpinBox" parent="Menu/BestFitTolerance"]
 layout_mode = 0
 offset_left = 277.0
 offset_top = 4.0
@@ -109,7 +109,7 @@ theme_override_font_sizes/font_size = 25
 text = "Mutation Chance:
 "
 
-[node name="Input" type="SpinBox" parent="Menu/MutationChance"]
+[node name="MutInput" type="SpinBox" parent="Menu/MutationChance"]
 layout_mode = 0
 offset_left = 277.0
 offset_right = 360.063
@@ -126,7 +126,7 @@ theme_override_font_sizes/font_size = 25
 text = "Crossover Chance:
 "
 
-[node name="Input" type="SpinBox" parent="Menu/CrossoverChance"]
+[node name="CrossInput" type="SpinBox" parent="Menu/CrossoverChance"]
 layout_mode = 0
 offset_left = 278.0
 offset_right = 361.063
@@ -137,6 +137,53 @@ step = 0.01
 value = 0.01
 alignment = 2
 
+[node name="Stats" type="Label" parent="Menu"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Statistics"
+horizontal_alignment = 1
+
+[node name="CurrentGen" type="Label" parent="Menu"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+
+[node name="ReachedGoal" type="Label" parent="Menu"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+
+[node name="AverageFitnessGen" type="Label" parent="Menu"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+
+[node name="StartSimulation" type="Button" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Start Simulation
+"
+
+[node name="RestartSimulation" type="Button" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+disabled = true
+text = "Restart Simulation"
+
+[node name="EndProgram" type="Button" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "End Program"
+
 [connection signal="toggled" from="Menu/SelectionMethod" to="Menu" method="_on_selection_method_toggled"]
 [connection signal="toggled" from="Menu/CrossMethod" to="Menu" method="_on_cross_method_toggled"]
 [connection signal="toggled" from="Menu/RandomPointCross" to="Menu" method="_on_random_point_cross_toggled"]
+[connection signal="value_changed" from="Menu/Population/PopInput" to="Menu" method="_on_pop_input_value_changed"]
+[connection signal="value_changed" from="Menu/GenerationLimit/GenInput" to="Menu" method="_on_gen_input_value_changed"]
+[connection signal="value_changed" from="Menu/BestFitTolerance/FitInput" to="Menu" method="_on_fit_input_value_changed"]
+[connection signal="value_changed" from="Menu/MutationChance/MutInput" to="Menu" method="_on_mut_input_value_changed"]
+[connection signal="value_changed" from="Menu/CrossoverChance/CrossInput" to="Menu" method="_on_cross_input_value_changed"]
+[connection signal="pressed" from="Menu/StartSimulation" to="Menu" method="_on_start_simulation_pressed"]
+[connection signal="pressed" from="Menu/RestartSimulation" to="Menu" method="_on_restart_simulation_pressed"]
+[connection signal="pressed" from="Menu/EndProgram" to="Menu" method="_on_end_program_pressed"]

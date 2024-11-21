@@ -6,12 +6,13 @@ extends Node
 var genomeSize: int = 75
 var bestDNA
 var bestFit: float = 1000000.0
-var generationNum: int = 0
+var generationNum: int = 1
 var previousGen=[]
 var nextGen=[]
 var geneIdx: int = 0
-var numReachedGoal: int = 0
 var creatureSpeed: float = 20.0
+var startSimulation: bool = false
+var simulationFinished: bool = false
 
 ## UI variables to be created and used
 ## generation features
@@ -25,3 +26,7 @@ var randomPointCross: bool = false
 ## operation chances
 var mutationChance: float = 0.01
 var crossoverChance: float = 0.5
+
+## display UI variables (use for data points)
+var averageFitnessGen: float = 0
+var numReachedGoal: int = 0

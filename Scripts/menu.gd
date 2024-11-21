@@ -1,5 +1,6 @@
 extends VBoxContainer
 ## obtaining input refrences
+@onready var fitnessType = $FitnessType
 @onready var rdmPointCross = $RandomPointCross
 @onready var selection = $SelectionMethod
 @onready var crossMethod = $CrossMethod
@@ -14,6 +15,7 @@ extends VBoxContainer
 @onready var currentGen = $CurrentGen
 @onready var simulationStart = $StartSimulation
 @onready var simulationRestart = $RestartSimulation
+@onready var endConditionStatus = $EndCondition
 
 # Called when the node enters the scene tree for the first time.
 ## since scene resets after every generation, need to check status of the bool variables
@@ -27,10 +29,19 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
+	if simulationStart.disabled and !Global.startSimulation:
+		endConditionStatus.visible = true
+		endConditionStatus.text = Global.endCondition
 
 ## sets all ui inputs to their default values, according to Global.gd
 func _defaultInputs() -> void:
+	if Global.eFitness:
+		fitnessType.set_pressed_no_signal(false)
+		fitnessType.text = ("Euclidean fitness")
+	else:
+		fitnessType.set_pressed_no_signal(true)
+		fitnessType.text = ("Manhattan fitness")
+		
 	if Global.strongGenomes:
 		selection.set_pressed_no_signal(true)
 		selection.text = ("Strong Genomes")
@@ -61,6 +72,7 @@ func _defaultInputs() -> void:
 ## disables all GA input variables
 func _disable_input() -> void:
 	# toggle buttons
+	fitnessType.set_disabled(true)
 	selection.set_disabled(true)
 	crossMethod.set_disabled(true)
 	rdmPointCross.set_disabled(true)
@@ -84,6 +96,7 @@ func _resetSimulation() -> void:
 	Global.geneIdx = 0
 	Global.startSimulation = false
 	Global.simulationFinished = false
+	Global.genFailedNum = 0
 	get_tree().reload_current_scene()
 	pass
 ## shows current statistics of the simulation
@@ -99,6 +112,15 @@ func _show_stats() -> void:
 	pass
 ## signal events
 ##
+func _on_fitness_type_toggled(toggled_on: bool) -> void:
+	if toggled_on:
+		Global.eFitness = !Global.eFitness
+		fitnessType.text = ("Manhattan fitness")
+	else:
+		Global.eFitness = !Global.eFitness
+		fitnessType.text = ("Euclidean fitness")
+	pass # Replace with function body.
+	
 func _on_random_point_cross_toggled(toggled_on: bool) -> void:
 	if toggled_on:
 		Global.randomPointCross = !Global.randomPointCross
@@ -149,4 +171,3 @@ func _on_end_program_pressed() -> void:
 ## will reset Global variables to be ready to restart the simulation
 func _on_restart_simulation_pressed() -> void:
 	_resetSimulation()
-	pass # Replace with function body.

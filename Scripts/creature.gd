@@ -68,9 +68,26 @@ func _physics_process(delta: float) -> void:
 func die() -> void:
 	# calculates how far creature is away from goal
 	alive = false
-	#fitness = ((global_position.distance_squared_to(goal.global_position)))
-	fitness = ((global_position.distance_to(goal.global_position)))
+	if Global.eFitness:
+		print("euc fitness selected")
+		fitness = _euclidean_fitness()
+	else:
+		print("euc man selected")
+		fitness = _manhattan_fitness()
+		
+	#fitness = ((global_position.distance_to(goal.global_position)))
 	pass
+
+## calculates fitness with euclidean formula
+func _euclidean_fitness() -> float:
+	return global_position.distance_to(goal.global_position)
+
+## calculates fitness with manhattan formula
+func _manhattan_fitness() -> float:
+	var goal: Vector2 = goal.global_position
+	var creature: Vector2 = global_position
+	var manFitness: float = abs(creature.x - goal.x) + abs(creature.y + goal.y) 
+	return manFitness
 
 # every tick will increase the index of the genome thus is position in game
 func _on_timer_timeout() -> void:

@@ -23,10 +23,16 @@ var bestFitTolerance: float = 0.6
 var strongGenomes: bool = false
 var singlePointCross: bool = false
 var randomPointCross: bool = false
+## to be added to menu
+var eFitness: bool = true
 ## operation chances
 var mutationChance: float = 0.01
 var crossoverChance: float = 0.5
+## used to determine how many generations failed to improve (reset with simulation)
+var genFailedNum: int = 0
 
 ## display UI variables (use for data points)
+var prevAvgFitessGen: float = 0
 var averageFitnessGen: float = 0
 var numReachedGoal: int = 0
+var endCondition: String = ""

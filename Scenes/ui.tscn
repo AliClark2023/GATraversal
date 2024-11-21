@@ -34,6 +34,11 @@ offset_bottom = 722.0
 theme_override_constants/separation = 5
 script = ExtResource("1_1s0fa")
 
+[node name="FitnessType" type="CheckButton" parent="Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Euclidean fitness"
+
 [node name="SelectionMethod" type="CheckButton" parent="Menu"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 25
@@ -176,6 +181,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 25
 text = "End Program"
 
+[node name="EndCondition" type="Label" parent="Menu"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+
+[connection signal="toggled" from="Menu/FitnessType" to="Menu" method="_on_fitness_type_toggled"]
 [connection signal="toggled" from="Menu/SelectionMethod" to="Menu" method="_on_selection_method_toggled"]
 [connection signal="toggled" from="Menu/CrossMethod" to="Menu" method="_on_cross_method_toggled"]
 [connection signal="toggled" from="Menu/RandomPointCross" to="Menu" method="_on_random_point_cross_toggled"]

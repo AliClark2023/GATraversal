@@ -34,7 +34,7 @@ func _process(delta: float) -> void:
 
 func spawnCreatures() ->void:
 	Global.numReachedGoal = 0
-	print ("Generation: " + str(Global.generationNum))
+	#print ("Generation: " + str(Global.generationNum))
 	# other generations
 	if Global.bestDNA:
 		## reset index, to be used in creature creation for gen2 onwards
@@ -78,9 +78,10 @@ func initialiseGenArray() -> void:
 ## checks game state every timeout (set to 1s)
 ## determines state of creatures
 func _on_timer_timeout() -> void:
-	if (Global.generationNum >= Global.generationLimit or !Global.startSimulation):
-		Global.startSimulation = false
-	else:
+	if Global.startSimulation:
+		
+		#if (Global.generationNum >= Global.generationLimit):
+			#Global.startSimulation = false
 		## checks if all creatures are dead
 		var numOfDead:int = 0
 		for creature in spawner.get_children():
@@ -106,65 +107,58 @@ func _on_timer_timeout() -> void:
 			if Global.bestFit > bestFitnessSoFar:
 				Global.bestFit = bestFitnessSoFar
 				Global.bestDNA = spawner.get_child(idOfBestFit).genome
-		
-			Global.generationNum +=1
-			#print("Reached Goal" + str(Global.numReachedGoal))
-			#print("Closest distance" + str(Global.bestFit))
+				
 			## Staticstic calculations
 			_calculateAverageFitnessGen()
-		
-			## go to next generation
-			get_tree().reload_current_scene()
-
-		
-	#var numOfDead:int = 0
-	## checks if all creatures are dead
-	#for creature in spawner.get_children():
-		#if !creature.alive:
-			#numOfDead += 1
-	#
-	## debug
-	##print("number of dead" + str(numOfDead))
-	#
-	### determines best fitness when all creatures are dead lower = better
-	#if numOfDead == spawnAmount:
-		### move condition to start of timeout
-		### add condition to reload scene if input have changed
-		### end condition
-		#if (Global.generationNum >= Global.generationLimit):
-			#Global.startSimulation = false
-		#else:
-			#var bestFitnessSoFar:float = 10000000.0
-			#var idOfBestFit: int = 0
-		#
-			#for i in spawner.get_child_count():
-				#var fitness: float = spawner.get_child(i).fitness
-				#if fitness < bestFitnessSoFar:
-					#idOfBestFit = i
-					#bestFitnessSoFar = fitness
-				#
-				### adding to previous gen array
-				#for j in spawner.get_child(i).genomeSize:
-					#Global.previousGen[i][0][j] = spawner.get_child(i).genome[j]
-					#Global.previousGen[i][1] = fitness
-		#
-			#if Global.bestFit > bestFitnessSoFar:
-				#Global.bestFit = bestFitnessSoFar
-				#Global.bestDNA = spawner.get_child(idOfBestFit).genome
-		#
-			#Global.generationNum +=1
-			##print("Reached Goal" + str(Global.numReachedGoal))
-			##print("Closest distance" + str(Global.bestFit))
-		#
-		### Staticstic calculations
-		#_calculateAverageFitnessGen()
-		#
-		### go to next generation
-		#get_tree().reload_current_scene()
+			
+			## end conditions
+			if genLimitReached():
+				Global.endCondition = "Generation limit was met"
+				Global.startSimulation = false
+			elif !averageImproved():
+				Global.endCondition = "Average fitness did not improve"
+				Global.startSimulation = false
+			elif goalReachedTest():
+				Global.endCondition = "Majority of creatures reached goal"
+				Global.startSimulation = false
+			else:
+				## go to next generation
+				Global.generationNum +=1
+				get_tree().reload_current_scene()
 
 ## end points of simulation
-func averageTest() -> bool:
+##
+## returns true when generation average is passed a set threshold (5%)
+## or number of failed generations is below the genFail threshold (10% of allowed generation) in a row
+func averageImproved() -> bool:
+	var threshold: float = 5.0
+	var improvement: float = ((Global.prevAvgFitessGen - Global.averageFitnessGen) / Global.prevAvgFitessGen) * 100
+	if improvement >= threshold:
+		## resets fail number
+		Global.genFailedNum = 0
+		return true
+	else:
+		Global.genFailedNum +=1
+		print("Gen failed num: " + str(Global.genFailedNum))
 	
+	var genFailThreshold: float = 0.1 * Global.generationLimit
+	if Global.genFailedNum > genFailThreshold:
+		return false
+	else:
+		return true
+
+## returns true when a majority (60%) of creatures hit the end goal
+func goalReachedTest() -> bool:
+	var threshold: float = 0.6
+	var target: float = Global.creaturesToSpawn * threshold
+	if Global.numReachedGoal >= target:
+		return true
+	return false
+
+## returns true if the generation limit has been reached
+func genLimitReached() -> bool:
+	if (Global.generationNum >= Global.generationLimit):
+		return true
 	return false
 
 ## statistic calculations
@@ -174,8 +168,12 @@ func _calculateAverageFitnessGen() ->void:
 	for i in spawner.get_child_count():
 			var fitness: float = spawner.get_child(i).fitness
 			totalFitness += fitness
-	
+
 	var avgFitness: float = totalFitness / Global.creaturesToSpawn
+
+	## setting previous average
+	Global.prevAvgFitessGen = Global.averageFitnessGen
+	## setting current average
 	Global.averageFitnessGen = avgFitness
 	pass
 
@@ -228,7 +226,7 @@ func constructMutation() -> void:
 ## will select genomes that are within a thresold of the best fitness
 ## or will create strong genome from best fit +- a percentage (available on UI)
 func selectStrong() -> void:
-	print("selecting strong")
+	#print("selecting strong")
 	for i in spawnAmount:
 		var strongThreshold: float = genomeThreshold * Global.bestFit
 		var currentFitness: float = Global.previousGen[i][1]
@@ -251,7 +249,7 @@ func selectStrong() -> void:
 ## some weak survive (50% of the weak), change to UI variable
 ## strong selection based on same method on selectStrong
 func selectWeak() -> void:
-	print("selecting weak")
+	#print("selecting weak")
 	var selectWeakChance :float = 0.5
 	for i in spawnAmount:
 		var rdm = randf()
@@ -278,7 +276,7 @@ func selectWeak() -> void:
 ## crossover from a specified index point onwards (point to be adjusted in UI)
 ## chance of crossover to occur (adhusted through UI)
 func singlePCross() -> void:
-	print("Single Pcross enabled")
+	#print("Single Pcross enabled")
 	var crossoverChance: float = 0.5
 	for i in range(0, spawnAmount, 2):
 		var rdm: float = randf()
@@ -307,7 +305,7 @@ func singlePCross() -> void:
 
 ## crossover between two index points (points to be adjusted in UI)
 func multiPCross() -> void:
-	print("Multi Pcross enabled")
+	#print("Multi Pcross enabled")
 	var crossoverChance: float = 0.5
 	for i in range(0, spawnAmount, 2):
 		var rdm: float = randf()
@@ -341,13 +339,13 @@ func multiPCross() -> void:
 
 ## crossover from a random index point onwards
 func randomPCross() -> void:
-	print("Random Pcross enabled")
+	#print("Random Pcross enabled")
 	var crossoverChance: float = 0.5
 	
 	for i in range(0, spawnAmount, 2):
 		var rdm: float = randf()
 		if rdm < crossoverChance:
-			print ("random P crossover")
+			#print ("random P crossover")
 			# assiging parents
 			var parent1 = Global.nextGen[i][0]
 			var parent2 = Global.nextGen[i+1][0]

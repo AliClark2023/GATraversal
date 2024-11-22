@@ -66,17 +66,17 @@ func _physics_process(delta: float) -> void:
 
 # calculates fitness
 func die() -> void:
-	# calculates how far creature is away from goal
-	alive = false
-	if Global.eFitness:
-		print("euc fitness selected")
-		fitness = _euclidean_fitness()
-	else:
-		print("euc man selected")
-		fitness = _manhattan_fitness()
-		
-	#fitness = ((global_position.distance_to(goal.global_position)))
-	pass
+	if alive:
+		# calculates how far creature is away from goal
+		alive = false
+		if Global.eFitness:
+			print("euc fitness selected")
+			fitness = _euclidean_fitness()
+		else:
+			print("man fitness selected")
+			fitness = _manhattan_fitness()
+			
+		#fitness = ((global_position.distance_to(goal.global_position)))
 
 ## calculates fitness with euclidean formula
 func _euclidean_fitness() -> float:

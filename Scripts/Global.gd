@@ -14,6 +14,9 @@ var creatureSpeed: float = 20.0
 var startSimulation: bool = false
 var simulationFinished: bool = false
 
+## used as flag as indicator for first time running program
+var programStarted: bool = false
+
 ## UI variables to be created and used
 ## generation features
 var generationLimit: int = 40

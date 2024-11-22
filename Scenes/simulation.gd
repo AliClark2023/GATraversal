@@ -79,9 +79,11 @@ func initialiseGenArray() -> void:
 ## initialise result array
 func initialiseResultArray() ->void:
 	## creating header row
-	Global.simResults = ["Population number","Generation limit", "Fitness type",
+	Global.simResults = [["Population number","Generation limit", "Fitness type",
 	"Selection type", "Crossover type", " Crossover chance", "Mutation chance",
-	"Average fitness (sim)", "Average fitness (gen)", "End Condition", "Finished on Gen"]
+	"Average fitness (sim)", "Average fitness (gen)", "End Condition", "Finished on Gen"],
+	[0, 0, "", "", "", 0.0, 0.0, 0.0, 0.0, "", 0]]
+	
 	pass
 ## checks game state every timeout (set to 1s)
 ## determines state of creatures

@@ -18,6 +18,7 @@ extends VBoxContainer
 @onready var simulationRestart = $RestartSimulation
 @onready var endConditionStatus = $EndCondition
 
+var writtenToFile: bool = false
 var dataFile: String = "res://Data/data.csv"
 
 # Called when the node enters the scene tree for the first time.
@@ -36,21 +37,64 @@ func _process(delta: float) -> void:
 		endConditionStatus.visible = true
 		endConditionStatus.text = Global.endCondition
 		## write simulation result to file (only once, make bool)
+		if !writtenToFile:
+			writtenToFile = true
+			## testing functions
+			formatResults()
+			save_to_csv(dataFile, Global.simResults)
 
 ## adds simulation data to array for saving later
 func formatResults() -> void:
+	var fitnessType: String = ""
+	if Global.eFitness:
+		fitnessType = "Euclidean fitness"
+	else:
+		fitnessType = "Manhattan fitness"
+	
+	var selectionType: String = ""
+	if Global.strongGenomes:
+		selectionType = "Strong Genomes Selected"
+	else:
+		selectionType = "Weak Genomes Selected"
+		
+	var crossoverType: String = ""
+	if Global.singlePointCross:
+		crossoverType = "Single Point Cross"
+	elif !Global.singlePointCross and Global.randomPointCross:
+		crossoverType = "Random Point Cross"
+	else:
+		crossoverType = "Multi-Point Cross"
+	
+	Global.simResults[1] = [Global.creaturesToSpawn, Global.generationLimit, fitnessType,
+	selectionType, crossoverType, Global.crossoverChance, Global.mutationChance,
+	 0.0, Global.averageFitnessGen, Global.endCondition, Global.generationNum]
+	
 	pass
-## records result of simulation
+
+## records result of simulation (appends to file)
 func save_to_csv(file_path: String, data: Array) -> void:
-	var file = FileAccess.open(file_path, FileAccess.WRITE_READ)
+	var file = FileAccess.open(file_path, FileAccess.READ_WRITE)
 	if file:
+		file.seek_end()
 		for row in data:
-			file.store_string(row + ",")  # Convert the row (Array) to a CSV row
+			#file.store_string(str(row + ", "))  # Convert the row (Array) to a CSV row
+			file.store_csv_line(row)
 		file.close()
 		print("Data written to:", file_path)
 	else:
 		print("Failed to open file:", file_path)
 
+func clearResultFile(file_path: String, data: Array) -> void:
+	var file = FileAccess.open(file_path, FileAccess.WRITE)
+	if file:
+		for row in data:
+			file.store_string(" ")  # Convert the row (Array) to a CSV row
+			##file.store_csv_line(row)
+		file.close()
+		print("Data cleared in:", file_path)
+	else:
+		print("Failed to open file:", file_path)
+	
 ## sets all ui inputs to their default values, according to Global.gd
 func _defaultInputs() -> void:
 	if Global.eFitness:
@@ -182,6 +226,11 @@ func _on_start_simulation_pressed() -> void:
 	_disable_input()
 	simulationRestart.set_disabled(false)
 	Global.startSimulation = true
+	
+	## do not reset bool when simulation reset
+	if !Global.programStarted:
+		Global.programStarted = true
+		clearResultFile(dataFile, Global.simResults)
 
 func _on_end_program_pressed() -> void:
 	get_tree().quit()

@@ -37,6 +37,7 @@ var genFailedNum: int = 0
 ## display UI variables (use for data points)
 var prevAvgFitessGen: float = 0
 var averageFitnessGen: float = 0
+var averageFitnessSim: float = 0
 var numReachedGoal: int = 0
 var endCondition: String = ""
 var simResults = []

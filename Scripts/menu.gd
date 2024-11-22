@@ -65,9 +65,11 @@ func formatResults() -> void:
 	else:
 		crossoverType = "Multi-Point Cross"
 	
+	var simAverageFitness: float = Global.averageFitnessSim / Global.generationNum
+	
 	Global.simResults[1] = [Global.creaturesToSpawn, Global.generationLimit, fitnessType,
-	selectionType, crossoverType, Global.crossoverChance, Global.mutationChance,
-	 0.0, Global.averageFitnessGen, Global.endCondition, Global.generationNum]
+	selectionType, Global.bestFitTolerance, crossoverType, Global.crossoverChance, Global.mutationChance,
+	 simAverageFitness, Global.averageFitnessGen, Global.endCondition, Global.generationNum]
 	
 	pass
 
@@ -159,6 +161,9 @@ func _resetSimulation() -> void:
 	Global.startSimulation = false
 	Global.simulationFinished = false
 	Global.genFailedNum = 0
+	Global.prevAvgFitessGen = 0
+	Global.averageFitnessGen = 0
+	Global.averageFitnessSim = 0
 	get_tree().reload_current_scene()
 	pass
 ## shows current statistics of the simulation

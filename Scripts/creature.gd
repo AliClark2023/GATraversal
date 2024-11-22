@@ -70,10 +70,10 @@ func die() -> void:
 		# calculates how far creature is away from goal
 		alive = false
 		if Global.eFitness:
-			print("euc fitness selected")
+			#print("euc fitness selected")
 			fitness = _euclidean_fitness()
 		else:
-			print("man fitness selected")
+			#print("man fitness selected")
 			fitness = _manhattan_fitness()
 			
 		#fitness = ((global_position.distance_to(goal.global_position)))

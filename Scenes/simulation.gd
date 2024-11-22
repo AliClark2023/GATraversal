@@ -80,9 +80,9 @@ func initialiseGenArray() -> void:
 func initialiseResultArray() ->void:
 	## creating header row
 	Global.simResults = [["Population number","Generation limit", "Fitness type",
-	"Selection type", "Crossover type", " Crossover chance", "Mutation chance",
+	"Selection type", "Best Fit Tolerance", "Crossover type", " Crossover chance", "Mutation chance",
 	"Average fitness (sim)", "Average fitness (gen)", "End Condition", "Finished on Gen"],
-	[0, 0, "", "", "", 0.0, 0.0, 0.0, 0.0, "", 0]]
+	[0, 0, "", "", 0.0, "", 0.0, 0.0, 0.0, 0.0, "", 0]]
 	
 	pass
 ## checks game state every timeout (set to 1s)
@@ -141,21 +141,25 @@ func _on_timer_timeout() -> void:
 ## returns true when generation average is passed a set threshold (5%)
 ## or number of failed generations is below the genFail threshold (10% of allowed generation) in a row
 func averageImproved() -> bool:
-	var threshold: float = 5.0
-	var improvement: float = ((Global.prevAvgFitessGen - Global.averageFitnessGen) / Global.prevAvgFitessGen) * 100
-	if improvement >= threshold:
-		## resets fail number
-		Global.genFailedNum = 0
+	## does not perform check on 1st gen
+	if Global.prevAvgFitessGen == 0:
 		return true
 	else:
-		Global.genFailedNum +=1
-		print("Gen failed num: " + str(Global.genFailedNum))
-	
-	var genFailThreshold: float = 0.1 * Global.generationLimit
-	if Global.genFailedNum > genFailThreshold:
-		return false
-	else:
-		return true
+		var threshold: float = 5.0
+		var improvement: float = ((Global.prevAvgFitessGen - Global.averageFitnessGen) / Global.prevAvgFitessGen) * 100
+		if improvement >= threshold:
+			## resets fail number
+			Global.genFailedNum = 0
+			return true
+		else:
+			Global.genFailedNum +=1
+			print("Gen failed num: " + str(Global.genFailedNum))
+		
+		var genFailThreshold: float = 0.1 * Global.generationLimit
+		if Global.genFailedNum > genFailThreshold:
+			return false
+		else:
+			return true
 
 ## returns true when a majority (60%) of creatures hit the end goal
 func goalReachedTest() -> bool:
@@ -185,6 +189,8 @@ func _calculateAverageFitnessGen() ->void:
 	Global.prevAvgFitessGen = Global.averageFitnessGen
 	## setting current average
 	Global.averageFitnessGen = avgFitness
+	## add to simulation average for later calculation (menu)
+	Global.averageFitnessSim += avgFitness
 	pass
 
 ## uses a selection method, crossover, mutation to create next generation

@@ -227,7 +227,7 @@ func _on_start_simulation_pressed() -> void:
 	simulationRestart.set_disabled(false)
 	Global.startSimulation = true
 	
-	## do not reset bool when simulation reset
+	## do not reset bool when simulations reset
 	if !Global.programStarted:
 		Global.programStarted = true
 		clearResultFile(dataFile, Global.simResults)

@@ -27,6 +27,7 @@ func _process(delta: float) -> void:
 			## needed to update spawn amount when starting simulation
 			spawnAmount = Global.creaturesToSpawn
 			initialiseGenArray()
+			initialiseResultArray()
 			
 		spawnCreatures()
 	pass
@@ -75,6 +76,13 @@ func initialiseGenArray() -> void:
 			genome.append(Vector2.ZERO)
 		Global.nextGen.append([genome, 0.0])
 
+## initialise result array
+func initialiseResultArray() ->void:
+	## creating header row
+	Global.simResults = ["Population number","Generation limit", "Fitness type",
+	"Selection type", "Crossover type", " Crossover chance", "Mutation chance",
+	"Average fitness (sim)", "Average fitness (gen)", "End Condition", "Finished on Gen"]
+	pass
 ## checks game state every timeout (set to 1s)
 ## determines state of creatures
 func _on_timer_timeout() -> void:

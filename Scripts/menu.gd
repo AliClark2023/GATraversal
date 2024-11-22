@@ -1,4 +1,5 @@
 extends VBoxContainer
+#extends Control
 ## obtaining input refrences
 @onready var fitnessType = $FitnessType
 @onready var rdmPointCross = $RandomPointCross
@@ -17,6 +18,8 @@ extends VBoxContainer
 @onready var simulationRestart = $RestartSimulation
 @onready var endConditionStatus = $EndCondition
 
+var dataFile: String = "res://Data/data.csv"
+
 # Called when the node enters the scene tree for the first time.
 ## since scene resets after every generation, need to check status of the bool variables
 func _ready() -> void:
@@ -32,6 +35,21 @@ func _process(delta: float) -> void:
 	if simulationStart.disabled and !Global.startSimulation:
 		endConditionStatus.visible = true
 		endConditionStatus.text = Global.endCondition
+		## write simulation result to file (only once, make bool)
+
+## adds simulation data to array for saving later
+func formatResults() -> void:
+	pass
+## records result of simulation
+func save_to_csv(file_path: String, data: Array) -> void:
+	var file = FileAccess.open(file_path, FileAccess.WRITE_READ)
+	if file:
+		for row in data:
+			file.store_string(row + ",")  # Convert the row (Array) to a CSV row
+		file.close()
+		print("Data written to:", file_path)
+	else:
+		print("Failed to open file:", file_path)
 
 ## sets all ui inputs to their default values, according to Global.gd
 func _defaultInputs() -> void:

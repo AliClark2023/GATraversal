@@ -86,7 +86,7 @@ func _euclidean_fitness() -> float:
 func _manhattan_fitness() -> float:
 	var goal: Vector2 = goal.global_position
 	var creature: Vector2 = global_position
-	var manFitness: float = abs(creature.x - goal.x) + abs(creature.y + goal.y) 
+	var manFitness: float = abs(creature.x - goal.x) + abs(creature.y - goal.y) 
 	return manFitness
 
 # every tick will increase the index of the genome thus is position in game
@@ -107,6 +107,7 @@ func _on_area_entered(area: Area2D) -> void:
 	if area.is_in_group("Goal"):
 		#print("Collided with goal")
 		Global.numReachedGoal += 1
+		Global.totalReachedGoal += 1
 		die()
 
 # mutation functions (remove once added in simulation)

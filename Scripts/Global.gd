@@ -26,7 +26,6 @@ var bestFitTolerance: float = 0.6
 var strongGenomes: bool = false
 var singlePointCross: bool = false
 var randomPointCross: bool = false
-## to be added to menu
 var eFitness: bool = true
 ## operation chances
 var mutationChance: float = 0.01
@@ -39,5 +38,6 @@ var prevAvgFitessGen: float = 0
 var averageFitnessGen: float = 0
 var averageFitnessSim: float = 0
 var numReachedGoal: int = 0
+var totalReachedGoal: int = 0
 var endCondition: String = ""
 var simResults = []

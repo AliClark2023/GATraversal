@@ -81,8 +81,8 @@ func initialiseResultArray() ->void:
 	## creating header row
 	Global.simResults = [["Population number","Generation limit", "Fitness type",
 	"Selection type", "Best Fit Tolerance", "Crossover type", " Crossover chance", "Mutation chance",
-	"Average fitness (sim)", "Average fitness (gen)", "End Condition", "Finished on Gen"],
-	[0, 0, "", "", 0.0, "", 0.0, 0.0, 0.0, 0.0, "", 0]]
+	"Average fitness (sim)", "Average fitness (gen)", "End Condition", "Finished on Gen", "Total creatures reached goal"],
+	[0, 0, "", "", 0.0, "", 0.0, 0.0, 0.0, 0.0, "", 0, 0]]
 	
 	pass
 ## checks game state every timeout (set to 1s)

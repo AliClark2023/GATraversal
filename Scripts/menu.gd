@@ -69,7 +69,7 @@ func formatResults() -> void:
 	
 	Global.simResults[1] = [Global.creaturesToSpawn, Global.generationLimit, fitnessType,
 	selectionType, Global.bestFitTolerance, crossoverType, Global.crossoverChance, Global.mutationChance,
-	 simAverageFitness, Global.averageFitnessGen, Global.endCondition, Global.generationNum]
+	 simAverageFitness, Global.averageFitnessGen, Global.endCondition, Global.generationNum, Global.totalReachedGoal]
 	
 	pass
 
@@ -164,6 +164,7 @@ func _resetSimulation() -> void:
 	Global.prevAvgFitessGen = 0
 	Global.averageFitnessGen = 0
 	Global.averageFitnessSim = 0
+	Global.totalReachedGoal = 0
 	get_tree().reload_current_scene()
 	pass
 ## shows current statistics of the simulation

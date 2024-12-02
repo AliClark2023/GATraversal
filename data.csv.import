@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://150g34imxny1"
+
+[deps]
+
+files=["res://data.Generation limit.translation", "res://data.Fitness type.translation", "res://data.Selection type.translation", "res://data.Best Fit Tolerance.translation", "res://data.Crossover type.translation", "res://data. Crossover chance.translation", "res://data.Mutation chance.translation", "res://data.Average fitness (sim).translation", "res://data.Average fitness (gen).translation", "res://data.End Condition.translation", "res://data.Finished on Gen.translation", "res://data.Total creatures reached goal.translation"]
+
+source_file="res://data.csv"
+dest_files=["res://data.Generation limit.translation", "res://data.Fitness type.translation", "res://data.Selection type.translation", "res://data.Best Fit Tolerance.translation", "res://data.Crossover type.translation", "res://data. Crossover chance.translation", "res://data.Mutation chance.translation", "res://data.Average fitness (sim).translation", "res://data.Average fitness (gen).translation", "res://data.End Condition.translation", "res://data.Finished on Gen.translation", "res://data.Total creatures reached goal.translation"]
+
+[params]
+
+compress=true
+delimiter=0

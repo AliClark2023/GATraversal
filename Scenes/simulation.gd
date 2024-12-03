@@ -89,9 +89,6 @@ func initialiseResultArray() ->void:
 ## determines state of creatures
 func _on_timer_timeout() -> void:
 	if Global.startSimulation:
-		
-		#if (Global.generationNum >= Global.generationLimit):
-			#Global.startSimulation = false
 		## checks if all creatures are dead
 		var numOfDead:int = 0
 		for creature in spawner.get_children():
@@ -252,7 +249,7 @@ func selectStrong() -> void:
 		# genome is randomised from best fit genome?
 		# genome is discarded and a new one is created?
 		else:
-			## randomised from best fit, make available on UI
+			## randomised from best fit, make available on UI, improvement
 			var bestFitVariance: float = 0.30
 			for j in Global.genomeSize:
 				var gene: Vector2 = Global.bestDNA[j]
@@ -262,7 +259,7 @@ func selectStrong() -> void:
 				Global.nextGen[i][0][j] = newGene
 		pass
 
-## some weak survive (50% of the weak), change to UI variable
+## some weak survive (50% of the weak), change to UI variable, improvement
 ## strong selection based on same method on selectStrong
 func selectWeak() -> void:
 	#print("selecting weak")
@@ -279,7 +276,7 @@ func selectWeak() -> void:
 			Global.nextGen[i] = Global.previousGen[i]
 		# discards the rest and creates new genome
 		else:
-			## randomised from best fit, make available on UI
+			## randomised from best fit, make available on UI, improvement
 			var bestFitVariance: float = 0.30
 			for j in Global.genomeSize:
 				var gene: Vector2 = Global.bestDNA[j]
@@ -289,11 +286,11 @@ func selectWeak() -> void:
 				Global.nextGen[i][0][j] = newGene
 
 ## cross-over functions (spawn amount and arrays need to be even numbered)
-## crossover from a specified index point onwards (point to be adjusted in UI)
-## chance of crossover to occur (adhusted through UI)
+## crossover from a specified index point onwards (point could be adjusted in UI, improvement)
+## chance of crossover to occur (adjusted through UI)
 func singlePCross() -> void:
 	#print("Single Pcross enabled")
-	var crossoverChance: float = 0.5
+	var crossoverChance: float = Global.crossoverChance
 	for i in range(0, spawnAmount, 2):
 		var rdm: float = randf()
 		if rdm < crossoverChance:
@@ -319,10 +316,10 @@ func singlePCross() -> void:
 			Global.nextGen[i][0] = child1
 			Global.nextGen[i+1][0] = child2
 
-## crossover between two index points (points to be adjusted in UI)
+## crossover between two index points (points could be adjusted in UI, improvement)
 func multiPCross() -> void:
 	#print("Multi Pcross enabled")
-	var crossoverChance: float = 0.5
+	var crossoverChance: float = Global.crossoverChance
 	for i in range(0, spawnAmount, 2):
 		var rdm: float = randf()
 		if rdm < crossoverChance:
@@ -332,7 +329,7 @@ func multiPCross() -> void:
 			var parent2 = Global.nextGen[i+1][0]
 			var child1 =  parent1.duplicate(true)
 			var child2 = parent2.duplicate(true)
-			## cross-overpoints (make Available in UI, between 0 and 75(genomesize))
+			## cross-overpoints (make Available in UI, between 0 and 75(genomesize), improvement)
 			var indexStart: int = Global.genomeSize/5
 			var indexEnd: int = Global.genomeSize/1.5
 			
@@ -356,7 +353,7 @@ func multiPCross() -> void:
 ## crossover from a random index point onwards
 func randomPCross() -> void:
 	#print("Random Pcross enabled")
-	var crossoverChance: float = 0.5
+	var crossoverChance: float = Global.crossoverChance
 	
 	for i in range(0, spawnAmount, 2):
 		var rdm: float = randf()

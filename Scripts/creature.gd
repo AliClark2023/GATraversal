@@ -1,5 +1,4 @@
 extends Area2D
-#var original:bool = false
 var alive:bool = false
 var firstGen:bool = true
 var speed: float = Global.creatureSpeed
@@ -7,12 +6,8 @@ var genome =[]
 var gene: int = 0;
 # fitness is distance to goal (lower = better)
 var fitness: float = 0.0
-#@onready var goal: Area2D = get_node("Goal")
 var goal: Area2D
 var genomeSize: int = 75
-# make these available for editing
-var mutationChance: float = 0.05 # percentage based
-var crossoverChance: float = 0.10 # percentage based
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -55,7 +50,7 @@ func _ready() -> void:
 	else:
 		genome = Global.nextGen[Global.geneIdx][0]
 		pass
-	
+
 # moves creature according to its genome (dies when reached the end of genome)
 func _physics_process(delta: float) -> void:
 	if alive and gene < genome.size():
@@ -75,8 +70,6 @@ func die() -> void:
 		else:
 			#print("man fitness selected")
 			fitness = _manhattan_fitness()
-			
-		#fitness = ((global_position.distance_to(goal.global_position)))
 
 ## calculates fitness with euclidean formula
 func _euclidean_fitness() -> float:
@@ -109,11 +102,3 @@ func _on_area_entered(area: Area2D) -> void:
 		Global.numReachedGoal += 1
 		Global.totalReachedGoal += 1
 		die()
-
-# mutation functions (remove once added in simulation)
-func destMutation() -> void:
-	for i in genomeSize:
-		var v:= Vector2(randi_range(-1,1), randi_range(-1,1)).normalized() * speed
-		genome[i] = v
-
-	print("mutated")

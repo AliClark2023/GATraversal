@@ -1,2 +1,0 @@
-Population number,Generation limit,Fitness type,Selection type,Best Fit Tolerance,Crossover type, Crossover chance,Mutation chance,Average fitness (sim),Average fitness (gen),End Condition,Finished on Gen,Total creatures reached goal
-40,10,Euclidean fitness,Weak Genomes Selected,0.6,Multi-Point Cross,0.5,0.01,1052.41572440011,849.452928161621,Average fitness did not improve,7,0

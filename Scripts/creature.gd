@@ -22,7 +22,7 @@ func _ready() -> void:
 	# requires creature to be within another node and goal to be attached root node
 	goal = get_parent().get_parent().get_node("Goal")
 	
-	## original code
+	## original code from https://www.youtube.com/watch?v=TMztBMRGrOQ&t=1218s
 	## writing the genome
 	## first gen
 	#if Global.bestDNA == null:

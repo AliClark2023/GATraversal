@@ -135,8 +135,8 @@ func _on_timer_timeout() -> void:
 
 ## end points of simulation
 ##
-## returns true when generation average is passed a set threshold (5%)
-## or number of failed generations is below the genFail threshold (10% of allowed generation) in a row
+## returns true when generation average is passed a set threshold (5%) (improvement)
+## or number of failed generations is below the genFail threshold (10% of allowed generation) in a row (improvement)
 func averageImproved() -> bool:
 	## does not perform check on 1st gen
 	if Global.prevAvgFitessGen == 0:
@@ -236,8 +236,8 @@ func constructMutation() -> void:
 ## selection functions
 ##
 ## strongest survive
-## will select genomes that are within a thresold of the best fitness
-## or will create strong genome from best fit +- a percentage (available on UI)
+## will select genomes that are within a thresold of the best fitness (available on UI)
+## or will create strong genome from best fit +- a percentage (UI improvement)
 func selectStrong() -> void:
 	#print("selecting strong")
 	for i in spawnAmount:

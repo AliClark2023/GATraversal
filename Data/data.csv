@@ -1,0 +1,10 @@
+Population number,Generation limit,Fitness type,Selection type,Best Fit Tolerance,Crossover type, Crossover chance,Mutation chance,Average fitness (sim),Average fitness (gen),End Condition,Finished on Gen,Total creatures reached goal
+40,40,Manhattan fitness,Weak Genomes Selected,0.6,Multi-Point Cross,0.5,0.1,741.311641693115,722.963400650024,Generation limit was met,40,254
+Population number,Generation limit,Fitness type,Selection type,Best Fit Tolerance,Crossover type, Crossover chance,Mutation chance,Average fitness (sim),Average fitness (gen),End Condition,Finished on Gen,Total creatures reached goal
+40,40,Manhattan fitness,Weak Genomes Selected,0.6,Multi-Point Cross,0.5,0.1,1296.92769304911,1228.39650878906,Average fitness did not improve,9,0
+Population number,Generation limit,Fitness type,Selection type,Best Fit Tolerance,Crossover type, Crossover chance,Mutation chance,Average fitness (sim),Average fitness (gen),End Condition,Finished on Gen,Total creatures reached goal
+40,40,Manhattan fitness,Weak Genomes Selected,0.6,Multi-Point Cross,0.5,0.1,1341.34411388744,1151.25062065125,Average fitness did not improve,11,0
+Population number,Generation limit,Fitness type,Selection type,Best Fit Tolerance,Crossover type, Crossover chance,Mutation chance,Average fitness (sim),Average fitness (gen),End Condition,Finished on Gen,Total creatures reached goal
+40,40,Manhattan fitness,Weak Genomes Selected,0.6,Multi-Point Cross,0.5,0.1,730.761485534668,520.885269165039,Average fitness did not improve,25,95
+Population number,Generation limit,Fitness type,Selection type,Best Fit Tolerance,Crossover type, Crossover chance,Mutation chance,Average fitness (sim),Average fitness (gen),End Condition,Finished on Gen,Total creatures reached goal
+40,40,Manhattan fitness,Weak Genomes Selected,0.6,Multi-Point Cross,0.5,0.1,669.750402329185,223.020800018311,Majority of creatures reached goal,22,195

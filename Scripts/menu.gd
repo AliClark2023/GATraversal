@@ -30,7 +30,6 @@ func _ready() -> void:
 		_show_stats()
 		simulationRestart.set_disabled(false)
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if simulationStart.disabled and !Global.startSimulation:
@@ -86,6 +85,7 @@ func save_to_csv(file_path: String, data: Array) -> void:
 	else:
 		print("Failed to open file:", file_path)
 
+## clears data file at start of simulation if program has just started
 func clearResultFile(file_path: String, data: Array) -> void:
 	var file = FileAccess.open(file_path, FileAccess.WRITE)
 	if file:
@@ -96,7 +96,7 @@ func clearResultFile(file_path: String, data: Array) -> void:
 		print("Data cleared in:", file_path)
 	else:
 		print("Failed to open file:", file_path)
-	
+
 ## sets all ui inputs to their default values, according to Global.gd
 func _defaultInputs() -> void:
 	if Global.eFitness:

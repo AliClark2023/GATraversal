@@ -19,7 +19,10 @@ extends VBoxContainer
 @onready var endConditionStatus = $EndCondition
 
 var writtenToFile: bool = false
+## source code path
 var dataFile: String = "res://Data/data.csv"
+## exe path
+#var dataFile: String = "res://data.csv"
 
 # Called when the node enters the scene tree for the first time.
 ## since scene resets after every generation, need to check status of the bool variables
